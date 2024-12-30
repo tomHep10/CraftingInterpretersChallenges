@@ -3,7 +3,7 @@
 #include <string.h>
 
 struct Node{
-    int data;
+    char * data;
     struct Node* prev;
     struct Node* next;
 };
@@ -22,7 +22,7 @@ struct Node *newNode(const char * new_data){
 }
 
 void freeList(struct Node *head){
-    struct Node* temp;
+    struct Node* temp = NULL;
     while(head != NULL){
         temp = head;
         head = head->next;
@@ -31,17 +31,68 @@ void freeList(struct Node *head){
     }    
 }
 
+void printList(struct Node *head){
+    while(head != NULL){
+        printf("%s\n", head->data);
+        head = head->next;
+    }
+    printf("\n");
+};
+
+struct Node *insert(struct Node *head, struct Node *input, int index){
+    struct Node *node = head;
+    struct Node *start = head;
+
+    for(int i = 0; i <= index; i++){
+        // Case when index is 0
+        if (index == 0) {
+            input->next = head;
+            if (head != NULL) {
+                head->prev = input;
+            }
+            return input;
+        }
+
+        // Case for insertion when index is inside the list, not including index=0
+        if (i+1 == index){
+            struct Node *temp = node->next;
+            node->next = input;
+            input->prev = node;
+            input->next = temp;
+            if (temp != NULL){
+                temp->prev = input;
+            }
+            return start;
+        }
+
+        //Case where index is out of range
+        if (((i+1) != index) && (node->next == NULL)){
+            printf("ERROR: Index out of range\n");
+            return start;
+        }
+        
+        node = node->next;
+    }
+    printf("Uncaught error\n");
+    return NULL;
+}
+
+
 int main(){
     // Nodes with heap allocated strings
     struct Node *head = newNode("Hello");
     struct Node *second = newNode("World");
     struct Node *third = newNode("Practice");
-
+    
     head->next = second;
     second->prev = head;
     second->next = third;
     third->prev = second;
 
+    printList(head);
+    struct Node *new = newNode("It's a brand new");
+    head = insert(head, new, 0);
+    printList(head);
     freeList(head);
 
     return 0;
